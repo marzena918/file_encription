@@ -1,6 +1,7 @@
-from cryptography.fernet import Fernet
-from flask import Flask, render_template, request
+import os
 
+from cryptography.fernet import Fernet
+from flask import Flask, render_template, request, send_file
 
 app = Flask(__name__)
 
@@ -9,9 +10,31 @@ app = Flask(__name__)
 def render():
     return render_template("index.html")
 
+
+@app.route('/send_file', methods=['POST'])
+def file():
+    name = request.files['file'].filename
+    encrypt(request.files['file'].read(), name)
+    return ''
+
+
 # def print_hi(name):
 #     # key = Fernet.generate_key()
-#     key = load_form_file()
+# def genereate_and_save_key():
+#     mean_key = str(Fernet.generate_key())
+#     open("key", "w").close()
+#     with open("key", "w") as key:
+#         key.write(mean_key)
+
+def load_form_file():
+    with open("key") as key:
+        return key.read()
+
+
+# key = load_form_file()
+# zmienna = Fernet(key)
+#
+# print(key)
 #     print(f'zapisz jednorazowy klucz, inaczej odszyfrowanie pliku nie bedzie mozliwe: {key}')
 #     fernet = Fernet(key)
 #     encrypted = fernet.encrypt(b'dupa blada lukasz marzeczna to mozeby byc dowolny testkst z pliku dupa blada')
@@ -22,22 +45,35 @@ def render():
 #     fernet2 = Fernet(key2)
 #     decrypted = fernet2.decrypt(encrypted)
 #     print(decrypted)
-    # with open('nba.csv', 'rb') as file:
-    #     original = file.read()
-    #     encrypted = fernet.encrypt(original)
+# with open('nba.csv', 'rb') as file:
+#     original = file.read()
+#     encrypted = fernet.encrypt(original)
 
 
+def encrypt(file_content, file_name):
+    key = load_form_file()
+    fernet = Fernet(key)
+    encrypted = fernet.encrypt(file_content)
+    with open(f'FILES/{file_name}', 'wb') as dec_file:
+        dec_file.write(encrypted)
 
-# def encrypt() #file
+
 #     #byty pliku z przegladaki
 #      #zapisuje do FILES plik ze zmienioną nazwa
 #
-# def decrypt(id_pliku)
+# def decrypt(file_id):
+
 #     # ma zwrocick odkodowany plik
 #
-# def pobierz_wszystkie_pliki():
-#     pass
-# #lista plikow z katalogu FILES - spr na necie
+@app.route('/get_all_file')
+def pobierz_wszystkie_pliki():
+    return [{'name': i, "id": i} for i in os.listdir("FILES")]
+
+
+@app.route('/get_file/<string:id>')
+def get_file(id):
+    file_name = id
+    return send_file(f"FILES/{file_name}", as_attachment=True)
 
 
 if __name__ == '__main__':
