@@ -1,12 +1,27 @@
 from cryptography.fernet import Fernet
 
 def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+    # key = Fernet.generate_key()
+    key = load_form_file()
+    print(f'zapisz jednorazowy klucz, inaczej odszyfrowanie pliku nie bedzie mozliwe: {key}')
+    fernet = Fernet(key)
+    encrypted = fernet.encrypt(b'dupa blada lukasz marzeczna to mozeby byc dowolny testkst z pliku dupa blada')
+    # with open('FILES/nba', 'wb') as dec_file:
+    #     dec_file.write(encrypted)
+    print(encrypted)
+    key2 = Fernet.generate_key()
+    fernet2 = Fernet(key2)
+    decrypted = fernet2.decrypt(encrypted)
+    print(decrypted)
+    # with open('nba.csv', 'rb') as file:
+    #     original = file.read()
+    #     encrypted = fernet.encrypt(original)
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+def encrypt() #file
+    #byty pliku z przegladaki
+     #zapisuje do FILES plik ze zmienioną nazwa
+
+def decrypt(id_pliku)
+    # ma zwrocick odkodowany plik
