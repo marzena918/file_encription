@@ -70,10 +70,14 @@ def pobierz_wszystkie_pliki():
     return [{'name': i, "id": i} for i in os.listdir("FILES")]
 
 
+def decode_file_name(id):
+    return id
+
+
 @app.route('/get_file/<string:id>')
 def get_file(id):
     file_name = id
-    return send_file(f"FILES/{file_name}", as_attachment=True)
+    return send_file(f"FILES/{file_name}", as_attachment=True, download_name=decode_file_name(id))
 
 
 if __name__ == '__main__':

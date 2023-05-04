@@ -24,25 +24,8 @@
         }
         var formularz = new FormData();
         formularz.append('file', file);
-        var response = await fetch("/send_file", {method: 'POST', body: formularz});
-
-        // var reader = new FileReader();
-        // var fileByteArray = [];
-        // reader.readAsArrayBuffer(file);
-        // reader.onloadend = function (evt) {
-        //     if (evt.target.readyState === FileReader.DONE) {
-        //        var arrayBuffer = evt.target.result,
-        //            array = new Uint8Array(arrayBuffer);
-        //        for (var i = 0; i < array.length; i++) {
-        //            fileByteArray.push(array[i]);
-        //         }
-        //     }
-        // }
-
-        // var odszyfrowany_plik= new FormData();
-        // odszyfrowany_plik.append('file', file);
+        await fetch("/send_file", {method: 'POST', body: formularz});
     }
-
 
     async function get_all() {
         const list = await (await fetch('/get_all_file')).json();
@@ -53,16 +36,10 @@
         list.forEach(v => {
             const li = document.createElement("li");
             li.innerHTML = `<a href='/get_file/${v.name}' download>${v.name}</a>`;
-            // li.onclick = () => get_file(v.id);
             ul.appendChild(li);
         });
     }
 
-
-
-
     get_all();
-
-
 </script>
 </html>
