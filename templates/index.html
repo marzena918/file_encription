@@ -28,14 +28,14 @@
     }
 
     async function get_all() {
-        const list = await (await fetch('/get_all_file')).json();
+        const list = await (await fetch(`/get_all_file`)).json();
         const div = document.getElementById("ul_id");
         const ul = document.createElement("ul");
         div.appendChild(ul);
 
         list.forEach(v => {
             const li = document.createElement("li");
-            li.innerHTML = `<a href='/get_file/${v.name}' download>${v.name}</a>`;
+            li.innerHTML = `<a href='/get_file/${v.id}' download>${v.name}</a>`;
             ul.appendChild(li);
         });
     }
