@@ -1,7 +1,12 @@
 import os
+import random
+from io import BytesIO
+from typing import BinaryIO
 
 from cryptography.fernet import Fernet
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, send_from_directory, Response
+from pip._internal.commands import download
+from werkzeug.wsgi import FileWrapper
 
 app = Flask(__name__)
 
@@ -61,13 +66,21 @@ def encrypt(file_content, file_name):
 #     #byty pliku z przegladaki
 #      #zapisuje do FILES plik ze zmienioną nazwa
 #
-# def decrypt(file_id):
+def decrypt(file_id):
+    key = load_form_file()
+    fernet = Fernet(key)
+    with open(f'FILES/{file_id}', 'rb') as file:
+        original = file.read()
+        return fernet.decrypt(original)
+
 
 #     # ma zwrocick odkodowany plik
 #
 @app.route('/get_all_file')
 def pobierz_wszystkie_pliki():
-    return [{'name': i, "id": i} for i in os.listdir("FILES")]
+    b = [random.randint(1, 50000) for x in range(8)]
+    bb = "".join(str(x) for x in b)
+    return [{'name': i, "id": bb} for i in os.listdir("FILES")]
 
 
 def decode_file_name(id):
@@ -76,8 +89,11 @@ def decode_file_name(id):
 
 @app.route('/get_file/<string:id>')
 def get_file(id):
-    file_name = id
-    return send_file(f"FILES/{file_name}", as_attachment=True, download_name=decode_file_name(id))
+    b = decrypt(id)
+    bb = BytesIO(b)
+    w = FileWrapper(bb)
+    return Response(w, mimetype="text/plain", direct_passthrough=True)
+    #return send_from_directory(b,mimetype='application', as_attachment=True, download_name=decode_file_name(id))
 
 
 if __name__ == '__main__':
