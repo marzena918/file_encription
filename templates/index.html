@@ -9,13 +9,14 @@
 
 <div>
     <input type="file" id="file_id">
-    <button onclick="wyslij()">wyślij</button>
+    <button onclick="wyslij(this)">wyślij</button>
 </div>
 <div id="ul_id"></div>
 </body>
 <script>
 
-    async function wyslij() {
+    async function wyslij(button) {
+        button.disabled = true;
         var inputWithFile = document.getElementById("file_id");
         var file = inputWithFile.files[0];
         if (!file) {
@@ -25,11 +26,15 @@
         var formularz = new FormData();
         formularz.append('file', file);
         await fetch("/send_file", {method: 'POST', body: formularz});
+        await get_all();
+        button.disabled = false;
+        inputWithFile.value= null;
     }
 
     async function get_all() {
-        const list = await (await fetch(`/get_all_file`)).json();
         const div = document.getElementById("ul_id");
+        div.innerHTML ='';
+        const list = await (await fetch(`/get_all_file`)).json();
         const ul = document.createElement("ul");
         div.appendChild(ul);
 
