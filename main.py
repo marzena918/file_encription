@@ -20,23 +20,28 @@ def file():
     return ''
 
 
-def load_form_file():
+def load_form_file() -> Fernet:
     with open("key") as key:
-        return key.read()
+        return Fernet(key.read())
 
 
 def encrypt(file_content, file_name):
-    key = load_form_file()
-    fernet = Fernet(key)
-    encrypted = fernet.encrypt(file_content)
-    encrypted_file_name = fernet.encrypt(bytes(file_name, 'utf-8')).decode("utf-8")
+    fernet = load_form_file()
+    encrypted_file_name = generate_encoded_file_name(fernet, file_name)
+    encrypt_and_save(encrypted_file_name, fernet, file_content)
+
+
+def encrypt_and_save(encrypted_file_name, fernet, file_content):
     with open(f'FILES/{encrypted_file_name}', 'wb') as dec_file:
-        dec_file.write(encrypted)
+        dec_file.write(fernet.encrypt(file_content))
 
 
-def decrypt_file_content(file_id):
-    key = load_form_file()
-    fernet = Fernet(key)
+def generate_encoded_file_name(fernet: Fernet, file_name: str) -> str:
+    return fernet.encrypt(bytes(file_name, 'utf-8')).decode("utf-8")
+
+
+def decrypt_file_content(file_id) -> bytes:
+    fernet = load_form_file()
     with open(f'FILES/{file_id}', 'rb') as file:
         original = file.read()
         return fernet.decrypt(original)
@@ -48,16 +53,15 @@ def pobierz_wszystkie_pliki():
 
 
 def decode_file_name(encoded_fiel_name) -> str:
-    key = load_form_file()
-    fernet = Fernet(key)
+    fernet = load_form_file()
     return fernet.decrypt(encoded_fiel_name).decode("utf-8")
 
 
-@app.route('/get_file/<string:id>')
-def get_file(id):
-    w = FileWrapper(BytesIO(decrypt_file_content(id)))
+@app.route('/get_file/<string:encoded_file_name>')
+def get_file(encoded_file_name):
+    w = FileWrapper(BytesIO(decrypt_file_content(encoded_file_name)))
     response = Response(w, mimetype="text/plain", direct_passthrough=True)
-    response.headers.set('Content-Disposition', 'attachment', filename=decode_file_name(id))
+    response.headers.set('Content-Disposition', 'attachment', filename=decode_file_name(encoded_file_name))
     return response
 
 
